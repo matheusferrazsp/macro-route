@@ -1,7 +1,5 @@
 "use client";
 
-//shadcn-ui
-
 import { Button } from "@/components/ui/button";
 
 import {

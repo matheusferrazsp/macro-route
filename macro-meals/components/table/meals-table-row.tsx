@@ -1,3 +1,5 @@
+"use client";
+
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Search, Trash2, UserCog } from "lucide-react";

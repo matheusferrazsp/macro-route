@@ -1,3 +1,5 @@
+"use client";
+
 import { DialogContent, DialogTitle, DialogDescription } from "../ui/dialog"; // Importe do seu componente de Dialog customizado
 import { DialogHeader } from "../ui/dialog"; // Supondo que o Header do seu Dialog também seja customizado
 import { TableBody, TableRow, TableCell } from "../ui/table";
