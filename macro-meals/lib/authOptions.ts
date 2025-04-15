@@ -87,6 +87,8 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
       }
       return token;
     },
@@ -95,9 +97,15 @@ export const authOptions: AuthOptions = {
       console.log("Session callback acionado", { session, token });
       if (token) {
         session.user = {
+          id: token.id,
           email: token.email,
           name: token.name,
           image: token.picture,
+        } as {
+          id: string;
+          email: string;
+          name?: string | null;
+          image?: string | null;
         };
       }
       return session;
