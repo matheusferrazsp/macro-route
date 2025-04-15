@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Meals from "@/app/models/meals";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 
 export interface Meal {
   _id: string;
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
   sevenDaysAgo.setHours(0, 0, 0, 0);
 
   const filter = {
-    userEmail: session.user.email, // <-- importante: filtrar por usuário
+    userEmail: session.user.email,
     createdAt: {
       $gte: sevenDaysAgo,
       $lte: now,

@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-
 import {
   Card,
   CardHeader,
@@ -14,13 +13,10 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
 //react icons
-
 import { FaGithub } from "react-icons/fa";
-
 import { FcGoogle } from "react-icons/fc";
 
 import { useState } from "react";
-
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -62,7 +58,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="h-full w-full grid grid-cols-2 antialiased items-center ">
+    <div className="h-full w-full grid grid-cols-2 antialiased items-center">
       <div className="md:h-full border-b md:border-r md:border-b-0 border-foreground/5 md:bg-muted p-10 text-muted-foreground flex flex-col md:justify-between">
         {/* Topo */}
         <div className="flex items-center gap-3 text-lg font-medium text-foreground">
