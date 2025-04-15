@@ -1,9 +1,9 @@
 import { connectToDatabase } from "@/lib/mongodb";
-import Meals from "@/app/models/meals"; // Ajuste o caminho relativo para corresponder à estrutura do projeto
-import { NextResponse } from "next/server";
+import Meals from "@/app/models/meals";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   await connectToDatabase();
@@ -20,7 +20,7 @@ export async function GET(
 }
 
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -50,8 +50,9 @@ export async function PUT(
     );
   }
 }
+
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
