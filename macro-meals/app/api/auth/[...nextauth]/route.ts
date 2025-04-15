@@ -39,7 +39,7 @@ const handler = NextAuth({
           if (!user) {
             throw new Error("Usuário não encontrado");
           }
-          const isValidPassword = bcrypt.compare(
+          const isValidPassword = await bcrypt.compare(
             credentials?.password ?? "",
             user.password as string
           );
