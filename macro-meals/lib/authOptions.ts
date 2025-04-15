@@ -66,7 +66,7 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async signIn({ account, profile }) {
       console.log("Tentando fazer login com o provedor:", account?.provider);
-      if (account?.provider === "github" || account?.provider === "google") {
+      if (account?.provider === "google" || account?.provider === "github") {
         console.log("Conectando ao banco para verificar usuário...");
         await connectToDatabase();
         const existingUser = await User.findOne({ email: profile?.email });
