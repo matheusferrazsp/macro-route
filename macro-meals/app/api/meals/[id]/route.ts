@@ -4,12 +4,12 @@ import Meals from "@/app/models/meals";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await connectToDatabase();
 
-    const meal = await Meals.findById(params.id);
+    const meal = await Meals.findById(context.params.id);
     if (!meal) {
       return NextResponse.json(
         { error: "Refeição não encontrada" },
@@ -28,15 +28,16 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const body = await req.json();
     await connectToDatabase();
 
-    const updatedMeal = await Meals.findByIdAndUpdate(params.id, body, {
+    const updatedMeal = await Meals.findByIdAndUpdate(context.params.id, body, {
       new: true,
     });
+
     if (!updatedMeal) {
       return NextResponse.json(
         { error: "Refeição não encontrada" },
@@ -58,12 +59,13 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await connectToDatabase();
 
-    const deletedMeal = await Meals.findByIdAndDelete(params.id);
+    const deletedMeal = await Meals.findByIdAndDelete(context.params.id);
+
     if (!deletedMeal) {
       return NextResponse.json(
         { error: "Refeição não encontrada" },
