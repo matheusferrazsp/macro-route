@@ -9,7 +9,6 @@ export async function GET(
   try {
     await connectToDatabase();
 
-    // Encontrando a refeição com o ID
     const meal = await Meals.findById(params.id);
     if (!meal) {
       return NextResponse.json(
@@ -35,7 +34,6 @@ export async function PUT(
     const body = await req.json();
     await connectToDatabase();
 
-    // Atualizando a refeição com o ID
     const updatedMeal = await Meals.findByIdAndUpdate(params.id, body, {
       new: true,
     });
@@ -65,7 +63,6 @@ export async function DELETE(
   try {
     await connectToDatabase();
 
-    // Deletando a refeição com o ID
     const deletedMeal = await Meals.findByIdAndDelete(params.id);
     if (!deletedMeal) {
       return NextResponse.json(
