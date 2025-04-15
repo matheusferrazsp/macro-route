@@ -5,10 +5,9 @@ interface IUser extends Document {
   name: string;
   email: string;
   password?: string;
-  _id: string; // '_id' já é gerado automaticamente pelo Mongoose, então se você usa string, tudo bem
+  _id: string;
 }
 
-// Definindo o esquema de usuário
 const UserSchema: Schema<IUser> = new mongoose.Schema(
   {
     name: {
@@ -18,19 +17,18 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true, // Garantindo que o email seja único
+      unique: true,
     },
     password: {
       type: String,
-      required: false, // Opcional, caso você tenha autenticação via provedores externos
+      required: false,
     },
   },
   {
-    timestamps: true, // Para adicionar createdAt e updatedAt automaticamente
+    timestamps: true,
   }
 );
 
-// Verifica se o modelo já foi criado anteriormente, senão cria o modelo
 const User: Model<IUser> =
   mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
 
