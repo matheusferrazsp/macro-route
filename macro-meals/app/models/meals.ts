@@ -1,6 +1,7 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import { Document, model, models, Schema } from "mongoose";
 
 interface IMeal extends Document {
+  _id: string;
   name: string;
   description?: string;
   calories?: number;
@@ -9,20 +10,16 @@ interface IMeal extends Document {
   type: "café" | "almoço" | "lanche" | "jantar";
 }
 
-const MealSchema: Schema<IMeal> = new mongoose.Schema({
+const MealSchema = new Schema({
+  _id: { type: String },
   name: { type: String, required: true },
   description: { type: String },
-  calories: { type: Number },
-  createdAt: { type: Date, required: true },
+  calories: { type: Number, required: true },
+  type: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
   time: { type: String },
-  type: {
-    type: String,
-    enum: ["café", "almoço", "lanche", "jantar"],
-    required: true,
-  },
 });
 
-const Meals: Model<IMeal> =
-  mongoose.models.Meal || mongoose.model<IMeal>("Meal", MealSchema);
+const Meals = models.Meals || model<IMeal>("Meals", MealSchema);
 
 export default Meals;

@@ -8,7 +8,7 @@ import { CaloriesChartCard } from "./week-calories-card";
 export interface Meal {
   _id: string;
   name: string;
-  description?: string;
+  description: string;
   calories: number;
   type: string;
   createdAt: string;
@@ -25,6 +25,19 @@ export function Meals() {
     const data = await res.json();
     setMeals(data.meals);
     setLoading(false);
+  };
+
+  const handleDeleteMeal = async (id: string) => {
+    try {
+      const res = await fetch(`/api/meals/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setMeals((prevMeals) => prevMeals.filter((meal) => meal._id !== id));
+      } else {
+        console.error("Erro ao excluir refeição");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir refeição:", error);
+    }
   };
 
   useEffect(() => {
@@ -47,7 +60,7 @@ export function Meals() {
       ) : (
         <div className=" justify-center flex flex-col w-full p-8 gap-4 md:grid md:grid-cols-3 md:p-8">
           <MealForm onMealCreated={fetchMeals} />
-          <TableMeals meals={meals} onDelete={fetchMeals} />
+          <TableMeals meals={meals} onDelete={handleDeleteMeal} />
           <CaloriesChartCard meals={meals} dailyGoal={2000} />
         </div>
       )}

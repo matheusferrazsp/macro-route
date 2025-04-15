@@ -24,14 +24,23 @@ interface Meal {
   createdAt: string;
 }
 
-export function TableMeals() {
-  const [meals, setMeals] = useState<Meal[]>([]);
+export interface TableMealsProps {
+  meals: Meal[];
+  onDelete: (id: string) => Promise<void>;
+}
+
+export function TableMeals({ meals }: TableMealsProps) {
+  const [mealsState, setMealsState] = useState<Meal[]>([]);
   const [pageIndex, setPageIndex] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const perPage = 5;
+
+  useEffect(() => {
+    setMealsState(meals);
+  }, [meals]);
 
   useEffect(() => {
     const fetchMeals = async () => {
@@ -42,7 +51,7 @@ export function TableMeals() {
         );
         const data = await res.json();
 
-        setMeals(data.meals);
+        setMealsState(data.meals);
         setTotalCount(data.totalCount);
       } catch (error) {
         console.error("Erro ao buscar refeições:", error);
@@ -54,7 +63,7 @@ export function TableMeals() {
     fetchMeals();
   }, [pageIndex, search]);
 
-  const onDelete = async (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/meals/${id}`, {
         method: "DELETE",
@@ -63,7 +72,7 @@ export function TableMeals() {
       const data = await response.json();
 
       if (response.ok) {
-        setMeals(meals.filter((meal) => meal._id !== id));
+        setMealsState(mealsState.filter((meal) => meal._id !== id));
         toast.success("Refeição excluída com sucesso!");
       } else {
         toast.error(data.error || "Erro ao excluir refeição.");
@@ -108,12 +117,12 @@ export function TableMeals() {
             </TableRow>
           </TableHeader>
           <TableBody className="text-xs">
-            {meals.map((meal) => (
+            {mealsState.map((meal) => (
               <MealsTableRow
                 key={meal._id}
                 meal={meal}
                 onEdit={() => setSelectedMeal(meal)}
-                onDelete={onDelete}
+                onDelete={handleDelete}
               />
             ))}
           </TableBody>
@@ -134,7 +143,7 @@ export function TableMeals() {
           meal={selectedMeal}
           onClose={() => setSelectedMeal(null)}
           onUpdate={(updatedMeal) => {
-            setMeals((prevMeals) =>
+            setMealsState((prevMeals) =>
               prevMeals.map((m) =>
                 m._id === updatedMeal._id ? updatedMeal : m
               )

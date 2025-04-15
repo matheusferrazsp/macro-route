@@ -2,56 +2,89 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Meals from "@/app/models/meals";
 
-// Tipagem oficial
-type Params = {
-  params: {
-    id: string;
-  };
-};
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  const { id } = params;
 
-export async function GET(req: NextRequest, { params }: Params) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
 
-  const meal = await Meals.findById(params.id);
-  if (!meal) {
+    const meal = await Meals.findById(id);
+    if (!meal) {
+      return NextResponse.json(
+        { error: "Refeição não encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(meal);
+  } catch (error) {
     return NextResponse.json(
-      { error: "Refeição não encontrada" },
-      { status: 404 }
+      { error: "Erro ao buscar refeição", details: (error as Error).message },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(meal);
 }
 
-export async function PUT(req: NextRequest, { params }: Params) {
-  const body = await req.json();
-  await connectToDatabase();
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  const { id } = params;
 
-  const updatedMeal = await Meals.findByIdAndUpdate(params.id, body, {
-    new: true,
-  });
+  try {
+    const body = await req.json();
+    await connectToDatabase();
 
-  if (!updatedMeal) {
+    const updatedMeal = await Meals.findByIdAndUpdate(id, body, {
+      new: true,
+    });
+    if (!updatedMeal) {
+      return NextResponse.json(
+        { error: "Refeição não encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(updatedMeal);
+  } catch (error) {
     return NextResponse.json(
-      { error: "Refeição não encontrada" },
-      { status: 404 }
+      {
+        error: "Erro ao atualizar refeição",
+        details: (error as Error).message,
+      },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(updatedMeal);
 }
 
-export async function DELETE(req: NextRequest, { params }: Params) {
-  await connectToDatabase();
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  const { id } = params;
 
-  const deletedMeal = await Meals.findByIdAndDelete(params.id);
+  try {
+    await connectToDatabase();
 
-  if (!deletedMeal) {
+    const deletedMeal = await Meals.findByIdAndDelete(id);
+    if (!deletedMeal) {
+      return NextResponse.json(
+        { error: "Refeição não encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: "Refeição deletada com sucesso" });
+  } catch (error) {
     return NextResponse.json(
-      { error: "Refeição não encontrada" },
-      { status: 404 }
+      { error: "Erro ao deletar refeição", details: (error as Error).message },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ message: "Refeição deletada com sucesso" });
 }

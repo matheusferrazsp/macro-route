@@ -1,13 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Meals from "@/app/models/meals";
 
-export async function GET(req: Request) {
+export interface Meal {
+  _id: string;
+  name: string;
+  description?: string;
+  calories: number;
+  type: string;
+  createdAt: string;
+  time?: string;
+}
+
+export async function GET(req: NextRequest) {
   await connectToDatabase();
 
   const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get("page") || "1");
-  const perPage = parseInt(searchParams.get("perPage") || "10");
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+  const perPage = Math.max(1, parseInt(searchParams.get("perPage") || "10"));
 
   const now = new Date();
   const sevenDaysAgo = new Date();
@@ -21,19 +31,27 @@ export async function GET(req: Request) {
     },
   };
 
-  const meals = await Meals.find(filter)
-    .skip((page - 1) * perPage)
-    .limit(perPage)
-    .sort({ createdAt: -1 });
+  try {
+    const meals = await Meals.find(filter)
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ createdAt: -1 });
 
-  const totalCount = await Meals.countDocuments(filter);
+    const totalCount = await Meals.countDocuments(filter);
 
-  return NextResponse.json({ meals, totalCount });
+    return NextResponse.json({ meals, totalCount });
+  } catch (error) {
+    console.error("Erro ao buscar refeições:", error);
+    return NextResponse.json(
+      { message: "Erro ao buscar refeições" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body: Meal = await req.json();
 
     const { name, description, calories, type, createdAt, time } = body;
 
