@@ -40,12 +40,17 @@ export function CaloriesChartCard({ meals }: CaloriesChartProps) {
     };
   });
 
+  const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
+
   return (
     <Card className="w-full bg-transparent">
       <CardHeader>
         <CardTitle className="text-md font-semibold">
           Consumo semanal de calorias
         </CardTitle>
+        <span className="text-sm text-muted-foreground mt-1">
+          Total: {totalCalories} kcal
+        </span>
       </CardHeader>
       <CardContent className="mt-auto h-[240px]">
         <ResponsiveContainer width="100%" height="100%">

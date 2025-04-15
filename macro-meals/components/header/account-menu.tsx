@@ -1,4 +1,7 @@
+"use client";
+
 import { ChevronDown, LogOut } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 import { Button } from "../ui/button";
 import {
@@ -11,6 +14,11 @@ import {
 } from "../ui/dropdown-menu";
 
 export function AccountMenu() {
+  const { data: session } = useSession();
+
+  const name = session?.user?.name || "Usuário";
+  const email = session?.user?.email || "sem email";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,11 +30,11 @@ export function AccountMenu() {
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 ">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="flex flex-col">
-          <span>Matheus Ferraz</span>
+          <span>{name}</span>
           <span className="text-xs font-normal text-muted-foreground">
-            contatomatheus.oferraz@gmail.com
+            {email}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

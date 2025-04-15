@@ -108,7 +108,7 @@ export function MealForm({ onMealCreated }: { onMealCreated: () => void }) {
   };
 
   return (
-    <Card className="bg-transparent w-[98%] md:w-[450px]">
+    <Card className="bg-transparent w-[98%] md:w-full]">
       <CardHeader>
         <CardTitle>Nova Refeição</CardTitle>
         <CardDescription>
@@ -238,11 +238,16 @@ export function MealForm({ onMealCreated }: { onMealCreated: () => void }) {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormControl>
-                    <input
-                      type="time"
-                      {...field}
-                      className="w-full py-2 px-3 border border-[#1b1b1d] rounded-md"
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Input
+                          type="time"
+                          {...field}
+                          className="w-full py-2 px-3 focus:outline-none "
+                          initial-focus
+                        />
+                      </PopoverTrigger>
+                    </Popover>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

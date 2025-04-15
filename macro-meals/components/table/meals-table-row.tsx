@@ -1,8 +1,10 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, UserCog } from "lucide-react";
+import { Search, Trash2, UserCog } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import { MealDetails } from "./meal-details";
 
 interface Meal {
   _id: string;
@@ -39,7 +41,7 @@ export function MealsTableRow({ meal, onEdit, onDelete }: MealsTableRowProps) {
               try {
                 setIsDeleting(true);
                 toast.dismiss(t);
-                await onDelete(meal._id); // Passa o id para a exclusão
+                await onDelete(meal._id);
                 toast.success("Refeição excluída com sucesso!");
               } catch {
                 toast.error("Erro ao excluir refeição.");
@@ -57,9 +59,27 @@ export function MealsTableRow({ meal, onEdit, onDelete }: MealsTableRowProps) {
 
   return (
     <TableRow>
-      <TableCell></TableCell>
-      <TableCell>{meal.name}</TableCell>
-      <TableCell>{new Date(meal.createdAt).toLocaleDateString()}</TableCell>
+      <TableCell>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Search className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <MealDetails
+            id={meal._id}
+            name={meal.name}
+            descrition={meal.description}
+            calories={meal.calories}
+            type={meal.type}
+            createdAt={new Date(meal.createdAt)}
+          />
+        </Dialog>
+      </TableCell>
+      <TableCell className="text-sm">{meal.name}</TableCell>
+      <TableCell className="text-sm">
+        {new Date(meal.createdAt).toLocaleDateString()}
+      </TableCell>
       <TableCell>
         <Button
           className="text-xs"
