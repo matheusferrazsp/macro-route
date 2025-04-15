@@ -1,5 +1,5 @@
 import { Header } from "@/components/header/header";
-import { Meals } from "@/components/meals";
+import { Meals } from "@/components/dashboard/meals";
 
 export default function Home() {
   return (

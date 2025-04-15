@@ -1,11 +1,8 @@
-"use client";
-
-import { Search, Trash2, UserCog } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { MealDetails } from "./meal-details";
+import { Button } from "@/components/ui/button";
+import { Trash2, UserCog } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface Meal {
   _id: string;
@@ -18,66 +15,58 @@ interface Meal {
 
 interface MealsTableRowProps {
   meal: Meal;
-  onDelete: (id: string) => void; // Função para ser chamada após exclusão
+  onEdit: () => void;
+  onDelete: (id: string) => void;
 }
 
-export function MealsTableRow({ meal, onDelete }: MealsTableRowProps) {
+export function MealsTableRow({ meal, onEdit, onDelete }: MealsTableRowProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const formattedDate = new Date(meal.createdAt).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
 
-  const handleDelete = async () => {
-    if (
-      window.confirm(
-        `Tem certeza que deseja excluir a refeição "${meal.name}"?`
-      )
-    ) {
-      setIsDeleting(true);
-      try {
-        const res = await fetch(`/api/meals/${meal._id}`, {
-          method: "DELETE",
-        });
-        if (res.ok) {
-          onDelete(meal._id); // Chama a função de callback para atualizar o estado no pai
-          alert("Refeição excluída com sucesso!");
-        } else {
-          const data = await res.json();
-          alert(data.error || "Erro ao excluir refeição");
-        }
-      } catch {
-        alert("Erro ao excluir refeição");
-      } finally {
-        setIsDeleting(false);
-      }
-    }
+  const handleDelete = () => {
+    toast.custom((t) => (
+      <div className="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 p-4 rounded-md shadow-md max-w-sm w-full">
+        <p className="text-sm mb-3">
+          Tem certeza que deseja excluir <strong>{meal.name}</strong>?
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t)}>
+            Cancelar
+          </Button>
+          <Button
+            className="bg-rose-500"
+            size="sm"
+            onClick={async () => {
+              try {
+                setIsDeleting(true);
+                toast.dismiss(t);
+                await onDelete(meal._id); // Passa o id para a exclusão
+                toast.success("Refeição excluída com sucesso!");
+              } catch {
+                toast.error("Erro ao excluir refeição.");
+              } finally {
+                setIsDeleting(false);
+              }
+            }}
+          >
+            Excluir
+          </Button>
+        </div>
+      </div>
+    ));
   };
 
   return (
     <TableRow>
+      <TableCell></TableCell>
+      <TableCell>{meal.name}</TableCell>
+      <TableCell>{new Date(meal.createdAt).toLocaleDateString()}</TableCell>
       <TableCell>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Search className="h-3 w-3" />
-            </Button>
-          </DialogTrigger>
-          <MealDetails
-            id={meal._id}
-            name={meal.name}
-            descrition={meal.description}
-            calories={meal.calories}
-            type={meal.type}
-            createdAt={new Date(meal.createdAt)}
-          />
-        </Dialog>
-      </TableCell>
-      <TableCell className="text-xs font-medium">{meal.name}</TableCell>
-      <TableCell>{formattedDate}</TableCell>
-      <TableCell>
-        <Button className="text-xs" variant="outline" size="sm">
+        <Button
+          className="text-xs"
+          variant="outline"
+          size="sm"
+          onClick={onEdit}
+        >
           <UserCog className="mr-1 h-3 w-3" />
           Editar
         </Button>

@@ -44,7 +44,7 @@ type FormValues = {
   calories: number;
   type: "café" | "almoço" | "jantar" | "lanche";
   createdAt: Date;
-  hour?: string;
+  time?: string;
 };
 
 const formSchema = z.object({
@@ -63,15 +63,16 @@ const formSchema = z.object({
   }),
 });
 
-export function MealForm() {
+export function MealForm({ onMealCreated }: { onMealCreated: () => void }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
-      calories: 0,
-      type: "café",
+      calories: undefined,
+      type: undefined,
       createdAt: new Date(),
+      time: "00:00",
     },
   });
 
@@ -91,22 +92,15 @@ export function MealForm() {
     try {
       const response = await fetch("/api/meals", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Erro ao salvar:", error);
-        return;
-      }
+      if (!response.ok) throw new Error("Erro ao salvar");
 
-      const data = await response.json();
-      console.log("Refeição criada com sucesso:", data);
       toast.success("Refeição salva com sucesso!");
       form.reset();
+      onMealCreated();
     } catch (err) {
       console.error("Erro ao enviar dados:", err);
       toast.error("Erro ao enviar dados");
@@ -130,7 +124,7 @@ export function MealForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Nome" {...field} />
+                    <Input placeholder="Insira o nome da refeição" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,7 +136,7 @@ export function MealForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Descrição" {...field} />
+                    <Input placeholder="Descrição da refeição" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -155,6 +149,7 @@ export function MealForm() {
                 <FormItem>
                   <FormControl>
                     <Input
+                      placeholder="Calorias da refeição"
                       type="number"
                       value={field.value}
                       onChange={(e) => field.onChange(Number(e.target.value))}
@@ -206,7 +201,7 @@ export function MealForm() {
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value
-                            ? field.value.toLocaleString()
+                            ? field.value.toLocaleDateString("pt-BR")
                             : "Escolher data"}
                         </Button>
                       </PopoverTrigger>
@@ -231,6 +226,23 @@ export function MealForm() {
                         </div>
                       </PopoverContent>
                     </Popover>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="time"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormControl>
+                    <input
+                      type="time"
+                      {...field}
+                      className="w-full py-2 px-3 border border-[#1b1b1d] rounded-md"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
