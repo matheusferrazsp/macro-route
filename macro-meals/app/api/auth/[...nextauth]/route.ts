@@ -1,12 +1,12 @@
-import NextAuth from "next-auth";
 import User from "../../../models/user";
 import { connectToDatabase } from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import { AuthOptions } from "next-auth";
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
@@ -94,6 +94,4 @@ const handler = NextAuth({
     signIn: "/sign-in",
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
-
-export { handler as GET, handler as POST };
+};

@@ -8,6 +8,7 @@ interface IMeal extends Document {
   createdAt: Date;
   time?: string;
   type: "café" | "almoço" | "lanche" | "jantar";
+  userEmail: string;
 }
 
 const MealSchema = new Schema({
@@ -18,6 +19,7 @@ const MealSchema = new Schema({
   type: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   time: { type: String },
+  userEmail: { type: String, required: true }, // <- novo campo
 });
 
 const Meals = models.Meals || model<IMeal>("Meals", MealSchema);

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Meals from "@/app/models/meals";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export interface Meal {
   _id: string;
@@ -13,6 +15,12 @@ export interface Meal {
 }
 
 export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+  }
+
   await connectToDatabase();
 
   const { searchParams } = new URL(req.url);
@@ -25,6 +33,7 @@ export async function GET(req: NextRequest) {
   sevenDaysAgo.setHours(0, 0, 0, 0);
 
   const filter = {
+    userEmail: session.user.email, // <-- importante: filtrar por usuário
     createdAt: {
       $gte: sevenDaysAgo,
       $lte: now,
@@ -51,10 +60,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body: Meal = await req.json();
+    const session = await getServerSession(authOptions);
 
+    if (!session || !session.user?.email) {
+      return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
+    }
+
+    const body = await req.json();
     const { name, description, calories, type, createdAt, time } = body;
-
     const parsedDate = createdAt ? new Date(createdAt) : new Date();
 
     await connectToDatabase();
@@ -66,31 +79,15 @@ export async function POST(req: NextRequest) {
       type,
       createdAt: parsedDate,
       time,
+      userEmail: session.user.email, // <- aqui associamos a refeição ao usuário
     });
 
     return NextResponse.json(newMeal, { status: 201 });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Erro ao salvar refeição:", error);
-
-      return NextResponse.json(
-        {
-          message: "Erro ao criar refeição",
-          error: error.message,
-          stack: error.stack,
-        },
-        { status: 500 }
-      );
-    } else {
-      console.error("Erro ao salvar refeição:", error);
-
-      return NextResponse.json(
-        {
-          message: "Erro ao criar refeição",
-          error: "Erro desconhecido",
-        },
-        { status: 500 }
-      );
-    }
+  } catch (error) {
+    console.error("Erro ao salvar refeição:", error);
+    return NextResponse.json(
+      { message: "Erro ao criar refeição" },
+      { status: 500 }
+    );
   }
 }
