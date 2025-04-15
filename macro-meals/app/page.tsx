@@ -8,11 +8,13 @@ import { Meals } from "@/components/dashboard/meals";
 export default function Home() {
   const { data: session, status } = useSession();
 
-  // Mostra um carregando enquanto a sessão não está totalmente verificada
+  console.log("Session Status:", status);
+  console.log("Session Data:", session);
+
   if (status === "loading") return <p>Carregando...</p>;
 
-  // Se o usuário não estiver logado, redireciona para o login
   if (!session) {
+    console.log("User not logged in, redirecting to /sign-in");
     redirect("/sign-in");
   }
 
