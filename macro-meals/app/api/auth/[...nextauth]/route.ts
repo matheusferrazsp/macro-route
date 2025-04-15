@@ -39,6 +39,8 @@ const handler = NextAuth({
           if (!user) {
             throw new Error("Usuário não encontrado");
           }
+
+          // Verificação da senha com bcrypt
           const isValidPassword = await bcrypt.compare(
             credentials?.password ?? "",
             user.password as string
@@ -46,8 +48,11 @@ const handler = NextAuth({
           if (!isValidPassword) {
             throw new Error("Senha inválida");
           }
-          return user;
-        } catch {
+
+          // Retorna o usuário com o _id
+          return { ...user.toObject(), id: user._id.toString() };
+        } catch (error) {
+          console.log(error);
           return null;
         }
       },
@@ -68,13 +73,16 @@ const handler = NextAuth({
       return true;
     },
 
+    // Atualização do JWT com _id e outras informações
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.id; // Usando user.id (que é o _id convertido em string)
         token.email = user.email;
       }
       return token;
     },
+
+    // Atualização da sessão com as informações do token
     async session({ session, token }) {
       if (token) {
         session.user = {
