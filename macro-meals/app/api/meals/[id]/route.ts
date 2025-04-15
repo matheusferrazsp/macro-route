@@ -1,22 +1,30 @@
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Meals from "@/app/models/meals";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  await connectToDatabase();
+  try {
+    await connectToDatabase();
 
-  const meal = await Meals.findById(params.id);
-  if (!meal) {
+    // Encontrando a refeição com o ID
+    const meal = await Meals.findById(params.id);
+    if (!meal) {
+      return NextResponse.json(
+        { error: "Refeição não encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(meal);
+  } catch (error) {
     return NextResponse.json(
-      { error: "Refeição não encontrada" },
-      { status: 404 }
+      { error: "Erro ao buscar refeição", details: (error as Error).message },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(meal);
 }
 
 export async function PUT(
@@ -24,13 +32,13 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    await connectToDatabase();
     const body = await req.json();
+    await connectToDatabase();
 
+    // Atualizando a refeição com o ID
     const updatedMeal = await Meals.findByIdAndUpdate(params.id, body, {
       new: true,
     });
-
     if (!updatedMeal) {
       return NextResponse.json(
         { error: "Refeição não encontrada" },
@@ -39,8 +47,7 @@ export async function PUT(
     }
 
     return NextResponse.json(updatedMeal);
-  } catch (error: unknown) {
-    console.error("Erro ao atualizar refeição:", error);
+  } catch (error) {
     return NextResponse.json(
       {
         error: "Erro ao atualizar refeição",
@@ -58,8 +65,8 @@ export async function DELETE(
   try {
     await connectToDatabase();
 
+    // Deletando a refeição com o ID
     const deletedMeal = await Meals.findByIdAndDelete(params.id);
-
     if (!deletedMeal) {
       return NextResponse.json(
         { error: "Refeição não encontrada" },
@@ -70,10 +77,7 @@ export async function DELETE(
     return NextResponse.json({ message: "Refeição deletada com sucesso" });
   } catch (error) {
     return NextResponse.json(
-      {
-        error: "Erro ao tentar excluir a refeição",
-        details: (error as Error).message,
-      },
+      { error: "Erro ao deletar refeição", details: (error as Error).message },
       { status: 500 }
     );
   }
