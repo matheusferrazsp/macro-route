@@ -52,6 +52,7 @@ export const authOptions: AuthOptions = {
       async authorize(credentials) {
         try {
           await connectToDatabase();
+
           const user = await User.findOne({ email: credentials?.email });
           if (!user) {
             return null;
@@ -59,14 +60,15 @@ export const authOptions: AuthOptions = {
 
           const isValidPassword = await bcrypt.compare(
             credentials?.password ?? "",
-            user.password as string
+            user.password
           );
           if (!isValidPassword) {
             return null;
           }
 
           return { ...user.toObject(), id: user._id.toString() };
-        } catch {
+        } catch (error) {
+          console.error("Erro ao autenticar:", error);
           return null;
         }
       },
