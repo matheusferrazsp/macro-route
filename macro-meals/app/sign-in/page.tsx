@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
-//react icons
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
