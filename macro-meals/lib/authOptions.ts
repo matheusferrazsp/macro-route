@@ -3,9 +3,8 @@ import GitHub from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import User from "@/app/models/user";
-import { AuthOptions } from "next-auth";
 import { connectToDatabase } from "./mongodb";
-import { DefaultSession } from "next-auth";
+import { AuthOptions, DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   interface Session {
