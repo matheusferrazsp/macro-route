@@ -57,8 +57,8 @@ export default function SignIn() {
   };
 
   return (
-    <div className="h-full w-full grid grid-cols-2 antialiased items-center">
-      <div className="md:h-full border-b md:border-r md:border-b-0 border-foreground/5 md:bg-muted p-10 text-muted-foreground flex flex-col md:justify-between">
+    <div className="h-full w-full md:grid md:grid-cols-2 antialiased overflow-y-hidden">
+      <div className="md:h-full border-b md:border-r md:border-b-0 border-foreground/5 md:bg-muted p-8 text-muted-foreground flex flex-col md:justify-between">
         <div className="flex items-center gap-3 text-lg font-medium text-foreground">
           <Beef className="h-5 w-5" />
           <span className="font-semibold">Macro.Meals</span>
@@ -69,8 +69,8 @@ export default function SignIn() {
           {new Date().getFullYear()}
         </footer>
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center p-6">
-        <Card className="md-h-auto w-[80%] sm:w-[420px] p-4 sm:p-8 ">
+      <div className="h-full flex flex-1 flex-col items-center justify-center p-6">
+        <Card className="md-h-auto w-[80%] sm:w-[420px] p-4 sm:p-8 mb-50 md:mb-0 ">
           <CardHeader>
             <CardTitle className="text-center text-2xl">Macro Meals</CardTitle>
             <CardDescription className="text-sm text-center text-accent-foreground">
