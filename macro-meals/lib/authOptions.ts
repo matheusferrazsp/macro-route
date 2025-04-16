@@ -57,7 +57,7 @@ export const authOptions: AuthOptions = {
           console.log("Usuário autenticado com sucesso.");
           return { ...user.toObject(), id: user._id.toString() };
         } catch (error) {
-          console.log("Erro ao autenticar:", error);
+          console.error("Erro ao autenticar:", error);
           return null;
         }
       },
@@ -66,34 +66,48 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async signIn({ account, profile }) {
       console.log("Tentando fazer login com o provedor:", account?.provider);
+
       if (account?.provider === "google" || account?.provider === "github") {
-        console.log("Conectando ao banco para verificar usuário...");
-        await connectToDatabase();
-        const existingUser = await User.findOne({ email: profile?.email });
-        if (!existingUser) {
-          console.log("Criando novo usuário...");
-          await User.create({
-            name: profile?.name,
-            email: profile?.email,
-          });
+        try {
+          console.log("Conectando ao banco para verificar/criar usuário...");
+          await connectToDatabase();
+
+          const existingUser = await User.findOne({ email: profile?.email });
+          if (!existingUser) {
+            await User.create({
+              name: profile?.name,
+              email: profile?.email,
+            });
+            console.log("Usuário criado com sucesso.");
+          } else {
+            console.log("Usuário já existe.");
+          }
+
+          return true;
+        } catch (error) {
+          console.error("Erro no signIn callback:", error);
+          return false; // evita timeout
         }
       }
-      console.log("Login bem-sucedido.");
+
       return true;
     },
 
     async jwt({ token, user }) {
       console.log("JWT callback acionado", { token, user });
+
       if (user) {
         token.email = user.email;
         token.name = user.name;
         token.picture = user.image;
       }
+
       return token;
     },
 
     async session({ session, token }) {
       console.log("Session callback acionado", { session, token });
+
       if (token) {
         session.user = {
           email: token.email,
@@ -105,6 +119,7 @@ export const authOptions: AuthOptions = {
           image?: string | null;
         };
       }
+
       return session;
     },
   },
