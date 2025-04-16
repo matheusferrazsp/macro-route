@@ -59,13 +59,11 @@ export default function SignIn() {
   return (
     <div className="h-full w-full grid grid-cols-2 antialiased items-center">
       <div className="md:h-full border-b md:border-r md:border-b-0 border-foreground/5 md:bg-muted p-10 text-muted-foreground flex flex-col md:justify-between">
-        {/* Topo */}
         <div className="flex items-center gap-3 text-lg font-medium text-foreground">
           <Beef className="h-5 w-5" />
           <span className="font-semibold">Macro.Meals</span>
         </div>
 
-        {/* Footer no desktop */}
         <footer className="hidden md:block text-sm">
           Painel do usuário Macro.Meals &copy; Matheus Ferraz -{" "}
           {new Date().getFullYear()}
