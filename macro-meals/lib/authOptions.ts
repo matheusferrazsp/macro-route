@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import User from "@/app/models/user";
 import { AuthOptions } from "next-auth";
 import { connectToDatabase } from "./mongodb";
-import { DefaultSession, Session, JWT } from "next-auth";
+import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   interface Session {
@@ -51,30 +51,22 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         try {
-          console.log("Tentando conectar ao banco de dados...");
           await connectToDatabase();
-          console.log("Banco de dados conectado com sucesso.");
-
           const user = await User.findOne({ email: credentials?.email });
           if (!user) {
-            console.log("Usuário não encontrado.");
             return null;
           }
 
-          console.log("Verificando senha...");
           const isValidPassword = await bcrypt.compare(
             credentials?.password ?? "",
             user.password as string
           );
           if (!isValidPassword) {
-            console.log("Senha inválida.");
             return null;
           }
 
-          console.log("Usuário autenticado com sucesso.");
           return { ...user.toObject(), id: user._id.toString() };
-        } catch (error) {
-          console.error("Erro ao autenticar:", error);
+        } catch {
           return null;
         }
       },
@@ -82,13 +74,9 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async signIn({ account, profile }) {
-      console.log("Tentando fazer login com o provedor:", account?.provider);
-
       if (account?.provider === "google" || account?.provider === "github") {
         try {
-          console.log("Conectando ao banco para verificar/criar usuário...");
           await connectToDatabase();
-
           const existingUser = await User.findOne({ email: profile?.email });
 
           if (!existingUser) {
@@ -96,14 +84,10 @@ export const authOptions: AuthOptions = {
               name: profile?.name,
               email: profile?.email,
             });
-            console.log("Usuário criado com sucesso.");
-          } else {
-            console.log("Usuário já existe.");
           }
 
           return true;
-        } catch (error) {
-          console.error("Erro no signIn callback:", error);
+        } catch {
           return false;
         }
       }
@@ -112,8 +96,6 @@ export const authOptions: AuthOptions = {
     },
 
     async jwt({ token, user }) {
-      console.log("JWT callback acionado", { token, user });
-
       if (user) {
         token.email = user.email;
         token.name = user.name;
@@ -123,14 +105,12 @@ export const authOptions: AuthOptions = {
       return token;
     },
 
-    async session({ session, token }: { session: Session; token: JWT }) {
-      console.log("Session callback acionado", { session, token });
-
+    async session({ session, token }) {
       if (token) {
         session.user = {
-          email: token.email,
-          name: token.name,
-          image: token.picture,
+          email: token.email || "",
+          name: token.name || null,
+          image: token.picture || null,
         } as {
           email: string;
           name?: string | null;
