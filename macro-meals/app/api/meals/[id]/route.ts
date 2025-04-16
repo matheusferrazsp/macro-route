@@ -38,6 +38,7 @@ export async function PUT(
 
   try {
     const body = await req.json();
+
     await connectToDatabase();
 
     const updatedMeal = await Meals.findByIdAndUpdate(id, body, {

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Meals from "@/app/models/meals";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
 
 export interface Meal {
   _id: string;
@@ -15,12 +13,6 @@ export interface Meal {
 }
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.email) {
-    return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
-  }
-
   await connectToDatabase();
 
   const { searchParams } = new URL(req.url);
@@ -33,7 +25,6 @@ export async function GET(req: NextRequest) {
   sevenDaysAgo.setHours(0, 0, 0, 0);
 
   const filter = {
-    userEmail: session.user.email,
     createdAt: {
       $gte: sevenDaysAgo,
       $lte: now,
@@ -60,12 +51,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || !session.user?.email) {
-      return NextResponse.json({ message: "Não autorizado" }, { status: 401 });
-    }
-
     const body = await req.json();
     const { name, description, calories, type, createdAt, time } = body;
     const parsedDate = createdAt ? new Date(createdAt) : new Date();
@@ -79,7 +64,7 @@ export async function POST(req: NextRequest) {
       type,
       createdAt: parsedDate,
       time,
-      userEmail: session.user.email, // <- aqui associamos a refeição ao usuário
+      userEmail: null, // Removemos a associação com o usuário
     });
 
     return NextResponse.json(newMeal, { status: 201 });
