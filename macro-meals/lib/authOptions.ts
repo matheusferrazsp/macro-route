@@ -5,6 +5,23 @@ import bcrypt from "bcryptjs";
 import User from "@/app/models/user";
 import { AuthOptions } from "next-auth";
 import { connectToDatabase } from "./mongodb";
+import { DefaultSession, Session, JWT } from "next-auth";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      email: string;
+      name?: string | null;
+      image?: string | null;
+    } & DefaultSession["user"];
+  }
+
+  interface JWT {
+    email: string;
+    name?: string;
+    picture?: string | null;
+  }
+}
 
 export const authOptions: AuthOptions = {
   session: {
@@ -34,14 +51,14 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         try {
-          console.log("Conectando ao banco de dados...");
+          console.log("Tentando conectar ao banco de dados...");
           await connectToDatabase();
           console.log("Banco de dados conectado com sucesso.");
 
           const user = await User.findOne({ email: credentials?.email });
           if (!user) {
             console.log("Usuário não encontrado.");
-            throw new Error("Usuário não encontrado");
+            return null;
           }
 
           console.log("Verificando senha...");
@@ -51,7 +68,7 @@ export const authOptions: AuthOptions = {
           );
           if (!isValidPassword) {
             console.log("Senha inválida.");
-            throw new Error("Senha inválida");
+            return null;
           }
 
           console.log("Usuário autenticado com sucesso.");
@@ -73,6 +90,7 @@ export const authOptions: AuthOptions = {
           await connectToDatabase();
 
           const existingUser = await User.findOne({ email: profile?.email });
+
           if (!existingUser) {
             await User.create({
               name: profile?.name,
@@ -86,7 +104,7 @@ export const authOptions: AuthOptions = {
           return true;
         } catch (error) {
           console.error("Erro no signIn callback:", error);
-          return false; // evita timeout
+          return false;
         }
       }
 
@@ -105,7 +123,7 @@ export const authOptions: AuthOptions = {
       return token;
     },
 
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       console.log("Session callback acionado", { session, token });
 
       if (token) {
