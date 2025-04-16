@@ -32,9 +32,9 @@ export default function SignIn() {
     e.preventDefault();
     setPending(true);
     const res = await signIn("credentials", {
-      redirect: false,
       email,
       password,
+      callbackUrl: "/",
     });
     if (res?.ok) {
       router.push("/");
