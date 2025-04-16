@@ -101,7 +101,6 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.email = user.email;
         token.name = user.name;
-        token.picture = user.image;
       }
 
       return token;
@@ -112,11 +111,9 @@ export const authOptions: AuthOptions = {
         session.user = {
           email: token.email || "",
           name: token.name || null,
-          image: token.picture || null,
         } as {
           email: string;
           name?: string | null;
-          image?: string | null;
         };
       }
 
