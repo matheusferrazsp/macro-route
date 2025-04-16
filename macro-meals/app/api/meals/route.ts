@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
       type,
       createdAt: parsedDate,
       time,
-      userEmail: null, // Removemos a associação com o usuário
     });
 
     return NextResponse.json(newMeal, { status: 201 });
